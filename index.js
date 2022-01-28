@@ -41,6 +41,14 @@ const run = async () => {
       res.send(result);
     });
 
+    // get user
+    app.get("/getUser", async (req, res) => {
+      const result = user.find({});
+
+      const userData = await result.toArray();
+      res.json(userData);
+    });
+
     // cheeck email
     app.get("/checkmail/:email", async (req, res) => {
       const email = req.params.email;
@@ -82,8 +90,6 @@ const run = async () => {
 
     app.get("/blogByStatus", async (req, res) => {
       const result = blogs.find({});
-
-      const count = await blogs.result();
       const blogsData = await result.toArray();
       res.json(blogsData);
     });
@@ -122,6 +128,16 @@ const run = async () => {
       res.send(result);
     });
 
+    // get review using email
+    app.get("/userReviews/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+
+      const data = reviews.find(filter);
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     // delete revied
     app.delete("/review/:id", async (req, res) => {
       const id = req.params.id;
@@ -130,27 +146,19 @@ const run = async () => {
       res.json(result);
     });
 
-    // pagination
-    // app.get('/blogbystatus', async (req, res) => {
-    //   const query = { status: "approve" }
-    //   const cursor = blogCollection.find(query);
-    //   const page = parseInt(req.query.page);
-    //   const size = parseInt(req.query.size)
-    //   console.log(req.query)
-    //   const count = await cursor.count();
-    //   let blogs;
-    //   if (page) {
-    //       blogs = await cursor.skip(page * size).limit(size).toArray();
-    //   }
-    //   else {
-    //       blogs = await cursor.limit(size).toArray();
-    //   }
+    // make admin
+    app.put("/makeAdmin", async (req, res) => {
+      const email = req.body.email;
+      const filter = { email: email };
+      const updateUserType = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await user.updateOne(filter, updateUserType);
 
-    //   res.send({
-    //       count,
-    //       blogs
-    //   });
-    // })
+      res.send(result);
+    });
   } finally {
     // await client.close();
   }
