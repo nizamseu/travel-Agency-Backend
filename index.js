@@ -62,6 +62,28 @@ const run = async () => {
 
     app.get("/addBlog", async (req, res) => {
       const result = blogs.find({});
+
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+
+      const count = await result.count();
+      let blogsData;
+      if (page) {
+        blogsData = await result
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+      } else {
+        blogsData = await result.limit(size).toArray();
+      }
+
+      res.json({ count, blogsData });
+    });
+
+    app.get("/blogByStatus", async (req, res) => {
+      const result = blogs.find({});
+
+      const count = await blogs.result();
       const blogsData = await result.toArray();
       res.json(blogsData);
     });
@@ -107,6 +129,28 @@ const run = async () => {
       const result = await reviews.deleteOne(filter);
       res.json(result);
     });
+
+    // pagination
+    // app.get('/blogbystatus', async (req, res) => {
+    //   const query = { status: "approve" }
+    //   const cursor = blogCollection.find(query);
+    //   const page = parseInt(req.query.page);
+    //   const size = parseInt(req.query.size)
+    //   console.log(req.query)
+    //   const count = await cursor.count();
+    //   let blogs;
+    //   if (page) {
+    //       blogs = await cursor.skip(page * size).limit(size).toArray();
+    //   }
+    //   else {
+    //       blogs = await cursor.limit(size).toArray();
+    //   }
+
+    //   res.send({
+    //       count,
+    //       blogs
+    //   });
+    // })
   } finally {
     // await client.close();
   }
