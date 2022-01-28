@@ -32,6 +32,25 @@ const run = async () => {
     const blogs = database.collection("blogs");
     const reviews = database.collection("reviews");
 
+    // add user
+    app.post("/addUser", async (req, res) => {
+      const data = req.body;
+      data.role = "user";
+      const result = await user.insertOne(data);
+
+      res.send(result);
+    });
+
+    // cheeck email
+    app.get("/checkmail/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+
+      const data = user.find(filter);
+      const result = await data.toArray();
+      res.send(result);
+    });
+
     app.post("/addBlog", async (req, res) => {
       const data = req.body;
       const result = await blogs.insertOne(data);
@@ -56,16 +75,37 @@ const run = async () => {
       res.send(result);
     });
 
+    // add new post
     app.post("/addReview", async (req, res) => {
       const data = req.body;
       const result = await reviews.insertOne(data);
       res.send(result);
     });
 
+    // get all the veriews
     app.get("/getReviews", async (req, res) => {
       const result = reviews.find({});
       const reviewData = await result.toArray();
       res.json(reviewData);
+    });
+
+    // find reviews titlebase
+
+    app.get("/findReview/:category", async (req, res) => {
+      const category = req.params.category;
+      const filter = { category: category };
+
+      const data = reviews.find(filter);
+      const result = await data.toArray();
+      res.send(result);
+    });
+
+    // delete revied
+    app.delete("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await reviews.deleteOne(filter);
+      res.json(result);
     });
   } finally {
     // await client.close();
