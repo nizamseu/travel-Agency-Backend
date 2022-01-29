@@ -69,7 +69,8 @@ const run = async () => {
     // get allBlogs
 
     app.get("/addBlog", async (req, res) => {
-      const result = blogs.find({});
+      const query = { status: "approve" };
+      const result = blogs.find(query);
 
       const page = parseInt(req.query.page);
       const size = parseInt(req.query.size);
@@ -92,6 +93,23 @@ const run = async () => {
       const result = blogs.find({});
       const blogsData = await result.toArray();
       res.json(blogsData);
+    });
+
+    // Change blog status..........
+    app.put("/blogByStatus/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = { $set: { status: "approve" } };
+      const result = await blogs.updateOne(filter, updateDoc);
+      res.json(result);
+    });
+
+    // delete blog in mongodb...........
+    app.delete("/blogByStatus/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await blogs.deleteOne(filter);
+      res.json(result);
     });
 
     // Find single Item
